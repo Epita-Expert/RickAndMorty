@@ -8,6 +8,7 @@
 import Foundation
 
 struct RMCharacterResponse: Decodable {
+    var info: RMInfo
     var results: [RMCharacter]
 }
 

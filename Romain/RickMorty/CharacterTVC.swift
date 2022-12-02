@@ -9,23 +9,49 @@ import UIKit
 import Alamofire
 import AlamofireImage
 
-class CharacterTVC: UITableViewController {
-    var characters: RMCharacterResponse?
-    let url: String = "https://rickandmortyapi.com/api/character"
+class CharacterTVC: UITableViewController, UITableViewDataSourcePrefetching {
+        
+    var characters: [RMCharacter] = []
+    var url: String = "https://rickandmortyapi.com/api/character"
     private let cellName = "augusteCell"
-
+    private var isFetchingInProgress = false
+    
     override func viewDidLoad() {
         downloadAndParse()
         super.viewDidLoad()
         let cellNib = UINib(nibName: "CharacterCell", bundle: nil)
         self.tableView.register(cellNib, forCellReuseIdentifier: cellName)
+        self.tableView.prefetchDataSource = self
+        self.tableView.refreshControl?.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        self.tableView.refreshControl?.addTarget(self, action: #selector(self.refresh(_:)), for: UIControl.Event.valueChanged)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
+    
+    @objc func refresh(_ sender: AnyObject) {
+        downloadAndParse()
+        self.refreshControl!.endRefreshing()
+    }
 
+    // MARK: Prefetch
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        debugPrint(indexPaths)
+        let lastIndexPath = IndexPath(row: tableView.numberOfRows(inSection: 0) - 1, section: 0)
+        
+        if indexPaths.contains(lastIndexPath) {
+            downloadAndParse()
+        }
+    }
+    
+    private func reloadAfterFetching(newRowsCount: Int) {
+        self.isFetchingInProgress = false
+        self.tableView.reloadData()
+    }
+    
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -35,17 +61,25 @@ class CharacterTVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return characters?.results.count ?? 0
+        return self.characters.count
     }
     
     private func downloadAndParse() {
+        guard isFetchingInProgress == false && url != nil else {
+            return
+        }
+        
+        isFetchingInProgress = true
+        
         AF.request(url).responseDecodable(of: RMCharacterResponse.self) { response in
             switch response.result {
                 case .success(let character):
                     debugPrint(character)
-                    self.characters = character
-                    self.tableView.reloadData()
-                case .failure(_):
+                    self.characters.append(contentsOf: character.results)
+                    self.url = character.info.next ?? ""
+                    self.reloadAfterFetching(newRowsCount: character.results.count)
+                case .failure(let e):
+                    debugPrint(e)
                     return
             }
         }
@@ -53,7 +87,7 @@ class CharacterTVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellName, for: indexPath) as? CharacterCell else { fatalError("missing cell") }
-        cell.displayChar(char: characters!.results[indexPath.row])
+        cell.displayChar(char: characters[indexPath.row])
         return cell
     }
 
@@ -108,7 +142,7 @@ class CharacterTVC: UITableViewController {
                  return
             }
             // Get the new view controller using segue.destination.
-            let characters = characters!.results[indexPath.row]
+            let characters = characters[indexPath.row]
             // Pass the selected object to the new view controller.
             detailVC.plouf = characters
          }

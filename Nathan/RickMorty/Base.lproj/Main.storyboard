@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="GBg-ml-aR7">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="XW5-TF-dua">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
@@ -23,7 +23,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" id="OJT-Kt-bpc"/>
                     <connections>
-                        <segue destination="bKk-zV-ZqQ" kind="show" identifier="git remote add origin git@github.com:Epita-Expert/RickAndMorty.git" id="tzB-ME-cUJ"/>
+                        <segue destination="bKk-zV-ZqQ" kind="show" identifier="goPlouf" id="tzB-ME-cUJ"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5Cm-bu-N8O" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
